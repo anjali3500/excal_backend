@@ -1,67 +1,83 @@
-var http=require('http')
-var calc=require('./calc.js')
+var http = require('http')
+// var calc=require('./calc.js')
 var ejs = require('ejs');
-var fs=require('fs');       //it will bring the file system module
+var fs = require('fs');       //it will bring the file system module
 var bodyParser = require('body-parser')
-var mongoose=require('mongoose');
-mongoose.connect('mongodb://localhost:27017/basic_node',{useUnifiedTopology: true})
-mongoose.connection.once('open',function(){
+var cors=require('cors');
+
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/basic_node', { useUnifiedTopology: true })
+mongoose.connection.once('open', function () {
 
     console.log('connection has been made')
-}).on('error',function(error){
-    console.log('error is',error)
+}).on('error', function (error) {
+    console.log('error is', error)
 })
 
-const express=require('express');
+const express = require('express');
 
-const app=express();
+const app = express();
+
+
+app.use(cors({ origin: ["http://localhost:3000"], methods: "GET,POST", credentials: true }));
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
-app.set('view engine','ejs');//express will know from here that we want to use ejs
+app.set('view engine', 'ejs');//express will know from here that we want to use ejs
 
-app.use('/assets',express.static('stuff'));
+app.use('/assets', express.static('stuff'));
 //app.use(express.static(__dirname + '/assets'));
 // app.use('/assets',function(req,res,next){
-    
+
 //     console.log(req,url);
 //     next();
 // });
 // app.get('/',function(req,res){  
 //     res.send('hello')           //response send by server
 // })
-app.get('/alien',function(req,res){
+
+app.get('/clubs', function (req, res) {
+    try {
+        console.log("IN CLUBS API");
+        let clubs = ["Spicmacay", "MAD", "Photog", "HTC"];
+        res.status(200).send(clubs);
+    }
+    catch (e) {
+        res.status(500).send("Internal server Error");
+    }
+})
+
+app.get('/alien', function (req, res) {
     res.send('hello dfggjhjk')
 })
-app.get('/contact',function(req,res){
+app.get('/contact', function (req, res) {
 
     console.log(req.query);
     //res.sendFile(__dirname+'/contact.html')
-    res.render('contact',{qs: req.query});
+    res.render('contact', { qs: req.query });
 })
 
-app.post('/contact',urlencodedParser ,function(req,res){
+app.post('/contact', urlencodedParser, function (req, res) {
 
     console.log(req.body);
     //res.sendFile(__dirname+'/contact.html')
-    res.render('contact-success',{data: req.body});
+    res.render('contact-success', { data: req.body });
 })
-app.get('/',function(req,res){
+app.get('/', function (req, res) {
     //res.sendFile(__dirname+'/contact.html')
     res.render('index');
 })
 //here we got output dynamically
-app.get('/profile/:name',function(req,res){
+app.get('/profile/:name', function (req, res) {
 
-    var data={age:67,job:'hjuuuu',hobbies:['eating','jumping']};
-    res.render('profile',{person:req.params.name,data:data});//to render the view
+    var data = { age: 67, job: 'hjuuuu', hobbies: ['eating', 'jumping'] };
+    res.render('profile', { person: req.params.name, data: data });//to render the view
 });
-app.get('/alien/:id',function(req,res)
-{
-    const id=req.params.id
-    res.send('heyyyyy anjali '+id)
+app.get('/alien/:id', function (req, res) {
+    const id = req.params.id
+    res.send('heyyyyy anjali ' + id)
 })
 
-app.listen(9000,function(req,res){
+app.listen(9000, function (req, res) {
     console.log('runninggggg')
 });
 // fs.readFile('calc.js','utf8',function(err,data){
